@@ -1,4 +1,7 @@
 
+# This file itself
+.gitignore
+
 # Files that contain priveleged information
 DiscToken.txt
 AdminList.txt
