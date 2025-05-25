@@ -2,13 +2,17 @@ from discord.ext import commands
 import requests
 import json
 
-
+# Generates the list of admin users
+# This list is hidden
 def admins() -> list[str]: 
     file = open("AdminList.txt", "r")
     list = file.read().split("\n")
     file.close()
     return list
 
+
+# This function updates the dictionary using http requests
+# TODO: Change to aiohttp instead of requests later
 def courses() -> dict[str, str]:
 
     courses : dict[str, str] = {}
@@ -33,6 +37,7 @@ def courses() -> dict[str, str]:
     
     return courses
 
+# All bot commands are in this class
 class Commands(commands.Cog):
     def __init__(self, bot : commands.Bot):
         self.bot = bot
@@ -44,6 +49,7 @@ class Commands(commands.Cog):
         test = await self.bot.is_owner(ctx.author)
         await ctx.send(str(test))
 
+    # Only admins can use this command due to the resources it consumes
     @commands.command()
     async def update(self, ctx: commands.Context):
         if (str(ctx.author) not in self.list):
@@ -65,6 +71,7 @@ class Commands(commands.Cog):
     async def cmmds(self, ctx: commands.Context):
         await ctx.send("This is a")
 
+    # Only admins can use this command because it shuts the bot off
     @commands.command()
     async def shutdown_protocol(self, ctx: commands.Context):
         if (str(ctx.author) not in self.list):

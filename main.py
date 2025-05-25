@@ -5,8 +5,10 @@ from Commands import Commands
 
 
 
-
+# Main
 async def main():
+    # The bot token is hidden
+    # WARNING: Any changes to the following three lines of code will be automatically denied
     file = open("DiscToken.txt", "r")
     token = file.readline()
     file.close()
