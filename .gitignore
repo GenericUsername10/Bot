@@ -1,0 +1,12 @@
+
+# Files that contain priveleged information
+DiscToken.txt
+AdminList.txt
+test.py
+
+# Virtual environment
+.venv/
+__pycache__
+
+# Settings
+.vscode/
