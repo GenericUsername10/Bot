@@ -42,13 +42,21 @@ class Commands(commands.Cog):
     def __init__(self, bot : commands.Bot):
         self.bot = bot
         self.list : list[str] = admins()
-        self.courses = courses()
+        #self.courses = courses()
     
     @commands.command()
     async def test(self, ctx: commands.Context):
         test = await self.bot.is_owner(ctx.author)
         await ctx.send(str(test))
 
+    '''
+    async def test(self, ctx: commands.Context):
+        atest = await self.bot.is_owner(ctx.author)
+        await ctx.send(str(atest))
+
+    tests = commands.Command(test)
+    '''
+    
     # Only admins can use this command due to the resources it consumes
     @commands.command()
     async def update(self, ctx: commands.Context):
