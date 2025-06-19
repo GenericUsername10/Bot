@@ -13,9 +13,10 @@ def admins() -> list[str]:
 
 # This function updates the dictionary using http requests
 # TODO: Change to aiohttp instead of requests later
-def courses() -> dict[str, str]:
+def courseTuple() -> tuple[dict[str, str], dict[str, str]]:
 
     courses : dict[str, str] = {}
+    section : dict[str, str] = {}
     for i in range(1, 6):
         page = 1
         r = requests.get(f"https://content.osu.edu/v2/classes/search?q=&academic-career=ugrd&client=class-search-ui&sort=&p=1&campus=col&catalog-number={i}xxx")
@@ -25,6 +26,7 @@ def courses() -> dict[str, str]:
 
         for course in jsondata.get("data").get("courses"):
             courses[f"{course.get("course").get("subject")} {course.get("course").get("catalogNumber")}"] = f"\n{course.get("course").get("title")}\n{course.get("course").get("description")}"
+            section[f"{course.get("course").get("subject")} {course.get("course").get("catalogNumber")}"] = f"\n{course.get("course").get("title")}\n{course.get("sections")}"
     
         while(jsondata.get("data").get("nextPageLink") != None):
             page = page + 1
@@ -34,15 +36,18 @@ def courses() -> dict[str, str]:
             jsondata = json.loads(r.text)
             for course in jsondata.get("data").get("courses"):
                 courses[f"{course.get("course").get("subject")} {course.get("course").get("catalogNumber")}"] = f"\n{course.get("course").get("title")}\n{course.get("course").get("description")}"
+                section[f"{course.get("course").get("subject")} {course.get("course").get("catalogNumber")}"] = f"\n{course.get("course").get("title")}\n{course.get("sections")}"
     
-    return courses
+    return (courses, section)
 
 # All bot commands are in this class
 class Commands(commands.Cog):
     def __init__(self, bot : commands.Bot):
         self.bot = bot
         self.list : list[str] = admins()
-        #self.courses = courses()
+        tuple = courseTuple()
+        self.courses = tuple[0]
+        self.section = tuple[1]
     
     @commands.command()
     async def test(self, ctx: commands.Context):
@@ -63,12 +68,20 @@ class Commands(commands.Cog):
         if (str(ctx.author) not in self.list):
             await ctx.send("User not authorized. Refrain from using admin commands.")
             return
-        self.courses = courses()
+        tuple = courseTuple()
+        self.courses = tuple[0]
+        self.section = tuple[1]
     
     @commands.command()
     async def classDesc(self, ctx: commands.Context, *args : str):
         courseTitle = args[0].upper() + " " + args[1]
         await ctx.send(f"{courseTitle}{self.courses.get(courseTitle)}")
+
+    @commands.command()
+    async def sections(self, ctx: commands.Context, *args : str):
+        courseTitle = args[0].upper() + " " + args[1]
+        print(f"{courseTitle}{self.section.get(courseTitle)}")
+        await ctx.send(f"{courseTitle}{self.section.get(courseTitle)}")
 
     @commands.command()
     async def schedule(self, ctx: commands.Context):
@@ -81,7 +94,7 @@ class Commands(commands.Cog):
 
     # Only admins can use this command because it shuts the bot off
     @commands.command()
-    async def shutdown_protocol(self, ctx: commands.Context):
+    async def shutdown(self, ctx: commands.Context):
         if (str(ctx.author) not in self.list):
             await ctx.send("User not authorized. Refrain from using admin commands.")
             return
