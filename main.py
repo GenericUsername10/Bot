@@ -8,7 +8,7 @@ from Commands import Commands
 # Main
 async def main():
     # The bot token is hidden
-    # WARNING: Any changes to the following three lines of code will be automatically denied
+    # WARNING: Do not change following three lines of code
     file = open("DiscToken.txt", "r")
     token = file.readline()
     file.close()
@@ -19,6 +19,13 @@ async def main():
     bot = commands.Bot(command_prefix='!', intents=intents)
     
     await bot.add_cog(Commands(bot))
+
+    @bot.event
+    async def on_guild_join(guild):
+        if guild.system_channel:
+            await guild.system_channel.send("Please use !about or !cmmds to learn more.")
+
+
     await bot.start(token=token)
 
 if (__name__ == '__main__'):

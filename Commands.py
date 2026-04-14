@@ -13,10 +13,10 @@ def admins() -> list[str]:
 
 # This function updates the dictionary using http requests
 # TODO: Change to aiohttp instead of requests later
-def courseTuple() -> tuple[dict[str, str], dict[str, str]]:
+def courseTuple() -> tuple[dict[str, str], dict[str, list]]:
 
     courses : dict[str, str] = {}
-    section : dict[str, str] = {}
+    section : dict[str, list] = {}
     for i in range(1, 6):
         page = 1
         r = requests.get(f"https://content.osu.edu/v2/classes/search?q=&academic-career=ugrd&client=class-search-ui&sort=&p=1&campus=col&catalog-number={i}xxx")
@@ -26,7 +26,8 @@ def courseTuple() -> tuple[dict[str, str], dict[str, str]]:
 
         for course in jsondata.get("data").get("courses"):
             courses[f"{course.get("course").get("subject")} {course.get("course").get("catalogNumber")}"] = f"\n{course.get("course").get("title")}\n{course.get("course").get("description")}"
-            section[f"{course.get("course").get("subject")} {course.get("course").get("catalogNumber")}"] = f"\n{course.get("course").get("title")}\n{course.get("sections")}"
+            course.get("sections").insert(0, f"\n{course.get("course").get("title")}\n")
+            section[f"{course.get("course").get("subject")} {course.get("course").get("catalogNumber")}"] = course.get("sections")
     
         while(jsondata.get("data").get("nextPageLink") != None):
             page = page + 1
@@ -36,7 +37,9 @@ def courseTuple() -> tuple[dict[str, str], dict[str, str]]:
             jsondata = json.loads(r.text)
             for course in jsondata.get("data").get("courses"):
                 courses[f"{course.get("course").get("subject")} {course.get("course").get("catalogNumber")}"] = f"\n{course.get("course").get("title")}\n{course.get("course").get("description")}"
-                section[f"{course.get("course").get("subject")} {course.get("course").get("catalogNumber")}"] = f"\n{course.get("course").get("title")}\n{course.get("sections")}"
+                course.get("sections").insert(0, f"\n{course.get("course").get("title")}\n")
+                section[f"{course.get("course").get("subject")} {course.get("course").get("catalogNumber")}"] = course.get("sections")
+                # f"\n{course.get("course").get("title")}\n{course.get("sections")[0]}"
     
     return (courses, section)
 
@@ -66,11 +69,14 @@ class Commands(commands.Cog):
     @commands.command()
     async def update(self, ctx: commands.Context):
         if (str(ctx.author) not in self.list):
-            await ctx.send("User not authorized. Refrain from using admin commands.")
             return
         tuple = courseTuple()
         self.courses = tuple[0]
         self.section = tuple[1]
+
+    @commands.command()
+    async def about(self, ctx: commands.Context):
+        await ctx.send("A simple bot used give information about courses and other things. Use !cmmds to find out more.")
     
     @commands.command()
     async def classDesc(self, ctx: commands.Context, *args : str):
@@ -79,9 +85,16 @@ class Commands(commands.Cog):
 
     @commands.command()
     async def sections(self, ctx: commands.Context, *args : str):
+        return
         courseTitle = args[0].upper() + " " + args[1]
-        print(f"{courseTitle}{self.section.get(courseTitle)}")
-        await ctx.send(f"{courseTitle}{self.section.get(courseTitle)}")
+        sections = self.section[courseTitle]
+        await ctx.send(sections[0])
+        for i in range(1, len(sections)):
+            await ctx.send(str(i))
+            await ctx.send(sections[i]["term"])
+            await ctx.send(sections[i]["meetings"])
+
+        await ctx.send("Done")
 
     @commands.command()
     async def schedule(self, ctx: commands.Context):
@@ -90,13 +103,19 @@ class Commands(commands.Cog):
 
     @commands.command()
     async def cmmds(self, ctx: commands.Context):
-        await ctx.send("This is a")
+        await ctx.send("1. !classDesc [Course Type (ex. Math)] [Course Number]\n" +
+        "Gives a short description of the course with a list of the pre-reqs required.\n"
+        + "Ex. Math 1151 gives information regarding Calc 1.\n\n" +
+        "2. !cmmds gives a list of the commands"
+        "3. !sections to be implemented"
+        )
+
+        
 
     # Only admins can use this command because it shuts the bot off
     @commands.command()
     async def shutdown(self, ctx: commands.Context):
         if (str(ctx.author) not in self.list):
-            await ctx.send("User not authorized. Refrain from using admin commands.")
             return
         
         await ctx.send("Termination confirmed. Ending session.")
