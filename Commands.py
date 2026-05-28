@@ -84,19 +84,6 @@ class Commands(commands.Cog):
         await ctx.send(f"{courseTitle}{self.courses.get(courseTitle)}")
 
     @commands.command()
-    async def sections(self, ctx: commands.Context, *args : str):
-        return
-        courseTitle = args[0].upper() + " " + args[1]
-        sections = self.section[courseTitle]
-        await ctx.send(sections[0])
-        for i in range(1, len(sections)):
-            await ctx.send(str(i))
-            await ctx.send(sections[i]["term"])
-            await ctx.send(sections[i]["meetings"])
-
-        await ctx.send("Done")
-
-    @commands.command()
     async def schedule(self, ctx: commands.Context):
         await ctx.send("https://buckeyelink.erp.osu.edu/psp/sps/EMPLOYEE/BUCK/c/PRJCS_MENU.PRJCS_SCHD_STRT.GBL")
     
@@ -121,3 +108,17 @@ class Commands(commands.Cog):
         await ctx.send("Termination confirmed. Ending session.")
         exit()
     
+    '''
+    @commands.command()
+    async def sections(self, ctx: commands.Context, *args : str):
+        
+        courseTitle = args[0].upper() + " " + args[1]
+        sections = self.section[courseTitle]
+        await ctx.send(sections[0])
+        for i in range(1, len(sections)):
+            await ctx.send(str(i))
+            await ctx.send(sections[i]["term"])
+            await ctx.send(sections[i]["meetings"])
+
+        await ctx.send("Done")
+'''
