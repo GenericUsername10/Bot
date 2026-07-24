@@ -2,8 +2,9 @@
 # Files that contain priveleged information
 DiscToken.txt
 AdminList.txt
-test.txt
+*.txt
 test.py
+temp.py
 
 # Virtual environment
 .venv/

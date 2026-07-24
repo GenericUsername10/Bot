@@ -28,9 +28,8 @@ def courseTuple() -> tuple[dict[str, str], dict[str, list]]:
             courses[f"{course.get("course").get("subject")} {course.get("course").get("catalogNumber")}"] = f"\n{course.get("course").get("title")}\n{course.get("course").get("description")}"
             course.get("sections").insert(0, f"\n{course.get("course").get("title")}\n")
             section[f"{course.get("course").get("subject")} {course.get("course").get("catalogNumber")}"] = course.get("sections")
-    
-        while(jsondata.get("data").get("nextPageLink") != None):
-            page = page + 1
+        page = 2
+        while(int(jsondata["data"]["totalPages"]) >= page):
             print("Page " + str(page))
             r = requests.get(f"https://content.osu.edu/v2/classes/search?q=&academic-career=ugrd&client=class-search-ui&sort=&p={page}&campus=col&catalog-number={i}xxx")
 
@@ -40,6 +39,7 @@ def courseTuple() -> tuple[dict[str, str], dict[str, list]]:
                 course.get("sections").insert(0, f"\n{course.get("course").get("title")}\n")
                 section[f"{course.get("course").get("subject")} {course.get("course").get("catalogNumber")}"] = course.get("sections")
                 # f"\n{course.get("course").get("title")}\n{course.get("sections")[0]}"
+            page = page + 1
     
     return (courses, section)
 
